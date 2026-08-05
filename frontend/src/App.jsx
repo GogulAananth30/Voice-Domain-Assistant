@@ -1,3 +1,4 @@
+import { cleanSpeech } from "./utils/speechCleaner";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -27,7 +28,7 @@ function App() {
 
   useEffect(() => {
     if (transcript) {
-      setMessage(transcript);
+      setMessage(cleanSpeech(transcript));
     }
   }, [transcript]);
 
@@ -36,6 +37,7 @@ function App() {
 
     SpeechRecognition.startListening({
       continuous: true,
+      language: "en-US",
     });
   };
 
@@ -44,19 +46,33 @@ function App() {
   };
 
   const speak = (text) => {
-    speechSynthesis.cancel();
+    window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
+
+    utterance.lang = "en-US";
     utterance.rate = 1;
     utterance.pitch = 1;
+    utterance.volume = 1;
 
-    speechSynthesis.speak(utterance);
+    const voices = window.speechSynthesis.getVoices();
+
+    const englishVoice =
+      voices.find((v) => v.lang === "en-US") ||
+      voices.find((v) => v.lang.startsWith("en")) ||
+      voices[0];
+
+    if (englishVoice) {
+      utterance.voice = englishVoice;
+    }
+
+    window.speechSynthesis.speak(utterance);
   };
 
   const sendMessage = async () => {
     if (!message.trim() || loading) return;
 
-    const text = message;
+    const text = cleanSpeech(message);
 
     setMessages((prev) => [
       ...prev,
@@ -108,7 +124,11 @@ function App() {
   };
 
   if (!browserSupportsSpeechRecognition) {
-    return <h2>Speech Recognition is not supported.</h2>;
+    return (
+      <h2 style={{ textAlign: "center", marginTop: "40px" }}>
+        Speech Recognition is not supported in this browser.
+      </h2>
+    );
   }
 
   return (
