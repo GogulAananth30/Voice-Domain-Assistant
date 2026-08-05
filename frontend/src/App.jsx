@@ -1,9 +1,9 @@
-import { cleanSpeech } from "./utils/speechCleaner";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { cleanSpeech } from "./utils/speechCleaner";
 import "./App.css";
 
 function App() {
@@ -48,7 +48,9 @@ function App() {
   const speak = (text) => {
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    const cleanedText = cleanSpeech(text);
+
+    const utterance = new SpeechSynthesisUtterance(cleanedText);
 
     utterance.lang = "en-US";
     utterance.rate = 1;

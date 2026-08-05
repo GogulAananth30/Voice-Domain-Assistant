@@ -1,4 +1,6 @@
 export function cleanSpeech(text) {
+  if (!text) return "";
+
   return text
     // Remove code blocks
     .replace(/```[\s\S]*?```/g, "")
@@ -22,10 +24,10 @@ export function cleanSpeech(text) {
     // Remove bullet symbols
     .replace(/[-•]/g, "")
 
-    // Remove extra blank lines
+    // Replace new lines with periods
     .replace(/\n+/g, ". ")
 
-    // Collapse multiple spaces
+    // Remove extra spaces
     .replace(/\s+/g, " ")
 
     .trim();
